@@ -15,11 +15,13 @@ import ErrorDetail from '../../../components/ErrorDetail';
 import PaginatedDataList, {
   ToolbarDeleteButton,
 } from '../../../components/PaginatedDataList';
+import PaginatedTable from '../../../components/PaginatedTable';
 import useRequest, { useDeleteItems } from '../../../util/useRequest';
 import { getQSConfig, parseQueryString } from '../../../util/qs';
 import useWsTemplates from './useWsTemplates';
 import AddDropDownButton from '../../../components/AddDropDownButton';
 import TemplateListItem from './TemplateListItem';
+import TemplateListRow from './TemplateListRow';
 
 // The type value in const QS_CONFIG below does not have a space between job_template and
 // workflow_job_template so the params sent to the API match what the api expects.
@@ -158,7 +160,7 @@ function TemplateList({ i18n }) {
   return (
     <PageSection>
       <Card>
-        <PaginatedDataList
+        <PaginatedTable
           contentError={contentError}
           hasContentLoading={isLoading || isDeleteLoading}
           items={templates}
@@ -243,8 +245,9 @@ function TemplateList({ i18n }) {
               ]}
             />
           )}
-          renderItem={template => (
-            <TemplateListItem
+          columns={['Name', 'Type', 'Jobs', '']}
+          renderItem={(template, index) => (
+            <TemplateListRow
               key={template.id}
               value={template.name}
               template={template}
@@ -252,6 +255,7 @@ function TemplateList({ i18n }) {
               onSelect={() => handleSelect(template)}
               isSelected={selected.some(row => row.id === template.id)}
               fetchTemplates={fetchTemplates}
+              index={index}
             />
           )}
           emptyStateControls={(canAddJT || canAddWFJT) && addButton}

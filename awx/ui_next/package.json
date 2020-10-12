@@ -10,6 +10,7 @@
     "@patternfly/patternfly": "^4.23.3",
     "@patternfly/react-core": "^4.32.1",
     "@patternfly/react-icons": "^4.5.0",
+    "@patternfly/react-table": "/Users/jschuler/Documents/GitHub/pf-react-fork/packages/react-table",
     "ansi-to-html": "^0.6.11",
     "axios": "^0.18.1",
     "codemirror": "^5.47.0",
