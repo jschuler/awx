@@ -245,7 +245,7 @@ function TemplateList({ i18n }) {
               ]}
             />
           )}
-          columns={['Name', 'Type', 'Jobs']}
+          columns={['Name', 'Type', 'Jobs', '']}
           renderItem={(template, index) => (
             <TemplateListRow
               key={template.id}

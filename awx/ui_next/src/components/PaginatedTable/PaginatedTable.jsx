@@ -125,18 +125,11 @@ class PaginatedTable extends React.Component {
         <ContentEmpty title={emptyContentTitle} message={emptyContentMessage} />
       );
     } else {
-      //   Content = (
-      //     <DataList
-      //       aria-label={dataListLabel}
-      //       onSelectDataListItem={id => this.handleListItemSelect(id)}
-      //     >
-      //       {items.map(renderItem)}
-      //     </DataList>
-      //   );
       Content = (
         <BaseTable aria-label={dataListLabel}>
           <BaseTableHead noWrap>
             <BaseTableHeaderRow>
+              <BaseHeaderCell key={0} columnIndex={0} />
               {columns.map((col, index) => (
                 <BaseHeaderCell key={index + 1} columnIndex={index + 1}>
                   {col}

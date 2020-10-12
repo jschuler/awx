@@ -45,7 +45,7 @@ function TemplateListRow({
   onSelect,
   detailUrl,
   fetchTemplates,
-  index
+  index,
 }) {
   const [isDisabled, setIsDisabled] = useState(false);
   const labelId = `check-action-${template.id}`;
@@ -76,6 +76,80 @@ function TemplateListRow({
     (!template.summary_fields.project ||
       (!template.summary_fields.inventory &&
         !template.ask_inventory_on_launch));
+  const actions = [];
+  if (template.type === 'workflow_job_template') {
+    actions.push({
+      title: (
+        <Tooltip content={i18n._(t`Visualizer`)} position="top">
+          <Button
+            isDisabled={isDisabled}
+            aria-label={i18n._(t`Visualizer`)}
+            css="grid-column: 1"
+            variant="plain"
+            component={Link}
+            to={`/templates/workflow_job_template/${template.id}/visualizer`}
+          >
+            <ProjectDiagramIcon />
+          </Button>
+        </Tooltip>
+      ),
+    });
+  }
+  if (template.summary_fields.user_capabilities.start) {
+    actions.push({
+      title: (
+        <Tooltip content={i18n._(t`Launch Template`)} position="top">
+          <LaunchButton resource={template}>
+            {({ handleLaunch }) => (
+              <Button
+                isDisabled={isDisabled}
+                aria-label={i18n._(t`Launch template`)}
+                css="grid-column: 2"
+                variant="plain"
+                onClick={handleLaunch}
+              >
+                <RocketIcon />
+              </Button>
+            )}
+          </LaunchButton>
+        </Tooltip>
+      ),
+    });
+  }
+  if (template.summary_fields.user_capabilities.edit) {
+    actions.push({
+      title: (
+        <Tooltip content={i18n._(t`Edit Template`)} position="top">
+          <Button
+            isDisabled={isDisabled}
+            aria-label={i18n._(t`Edit Template`)}
+            css="grid-column: 3"
+            variant="plain"
+            component={Link}
+            to={`/templates/${template.type}/${template.id}/edit`}
+          >
+            <PencilAltIcon />
+          </Button>
+        </Tooltip>
+      ),
+    });
+  }
+  if (template.summary_fields.user_capabilities.copy) {
+    actions.push({
+      title: (
+        <CopyButton
+          helperText={{
+            tooltip: i18n._(t`Copy Template`),
+            errorMessage: i18n._(t`Failed to copy template.`),
+          }}
+          isDisabled={isDisabled}
+          onCopyStart={handleCopyStart}
+          onCopyFinish={handleCopyFinish}
+          copyItem={copyTemplate}
+        />
+      ),
+    });
+  }
   return (
     <BaseTableBodyRow key={`${template.id}`}>
       <BaseBodyCell
@@ -83,6 +157,8 @@ function TemplateListRow({
         rowIndex={index}
         onSelect={onSelect}
         isSelected={isSelected}
+        disableSelection={isDisabled}
+        id={`select-jobTemplate-${template.id}`}
       />
       <BaseBodyCell columnIndex={1} rowIndex={index}>
         <span>
@@ -101,112 +177,14 @@ function TemplateListRow({
           </span>
         )}
       </BaseBodyCell>
-      <BaseBodyCell columnIndex={2} rowIndex={index}>{toTitleCase(template.type)}</BaseBodyCell>
+      <BaseBodyCell columnIndex={2} rowIndex={index}>
+        {toTitleCase(template.type)}
+      </BaseBodyCell>
       <BaseBodyCell columnIndex={3} rowIndex={index}>
         <Sparkline jobs={template.summary_fields.recent_jobs} />
       </BaseBodyCell>
+      <BaseBodyCell columnIndex={4} rowIndex={index} actions={actions} />
     </BaseTableBodyRow>
-  );
-  return (
-    <DataListItem aria-labelledby={labelId} id={`${template.id}`}>
-      <DataListItemRow>
-        <DataListCheck
-          isDisabled={isDisabled}
-          id={`select-jobTemplate-${template.id}`}
-          checked={isSelected}
-          onChange={onSelect}
-          aria-labelledby={labelId}
-        />
-        <DataListItemCells
-          dataListCells={[
-            <DataListCell key="name" id={labelId}>
-              <span>
-                <Link to={`${detailUrl}`}>
-                  <b>{template.name}</b>
-                </Link>
-              </span>
-              {missingResourceIcon && (
-                <span>
-                  <Tooltip
-                    content={i18n._(
-                      t`Resources are missing from this template.`
-                    )}
-                    position="right"
-                  >
-                    <ExclamationTriangleIcon css="color: #c9190b; margin-left: 20px;" />
-                  </Tooltip>
-                </span>
-              )}
-            </DataListCell>,
-            <DataListCell key="type">
-              {toTitleCase(template.type)}
-            </DataListCell>,
-            <DataListCell key="sparkline">
-              <Sparkline jobs={template.summary_fields.recent_jobs} />
-            </DataListCell>,
-          ]}
-        />
-        <DataListAction aria-label="actions" aria-labelledby={labelId}>
-          {template.type === 'workflow_job_template' && (
-            <Tooltip content={i18n._(t`Visualizer`)} position="top">
-              <Button
-                isDisabled={isDisabled}
-                aria-label={i18n._(t`Visualizer`)}
-                css="grid-column: 1"
-                variant="plain"
-                component={Link}
-                to={`/templates/workflow_job_template/${template.id}/visualizer`}
-              >
-                <ProjectDiagramIcon />
-              </Button>
-            </Tooltip>
-          )}
-          {template.summary_fields.user_capabilities.start && (
-            <Tooltip content={i18n._(t`Launch Template`)} position="top">
-              <LaunchButton resource={template}>
-                {({ handleLaunch }) => (
-                  <Button
-                    isDisabled={isDisabled}
-                    aria-label={i18n._(t`Launch template`)}
-                    css="grid-column: 2"
-                    variant="plain"
-                    onClick={handleLaunch}
-                  >
-                    <RocketIcon />
-                  </Button>
-                )}
-              </LaunchButton>
-            </Tooltip>
-          )}
-          {template.summary_fields.user_capabilities.edit && (
-            <Tooltip content={i18n._(t`Edit Template`)} position="top">
-              <Button
-                isDisabled={isDisabled}
-                aria-label={i18n._(t`Edit Template`)}
-                css="grid-column: 3"
-                variant="plain"
-                component={Link}
-                to={`/templates/${template.type}/${template.id}/edit`}
-              >
-                <PencilAltIcon />
-              </Button>
-            </Tooltip>
-          )}
-          {template.summary_fields.user_capabilities.copy && (
-            <CopyButton
-              helperText={{
-                tooltip: i18n._(t`Copy Template`),
-                errorMessage: i18n._(t`Failed to copy template.`),
-              }}
-              isDisabled={isDisabled}
-              onCopyStart={handleCopyStart}
-              onCopyFinish={handleCopyFinish}
-              copyItem={copyTemplate}
-            />
-          )}
-        </DataListAction>
-      </DataListItemRow>
-    </DataListItem>
   );
 }
 
